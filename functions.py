@@ -1,9 +1,5 @@
 import numpy as np
-import pandas as pd
 from pgmpy.factors.discrete import State, TabularCPD
-from pgmpy.inference import VariableElimination
-from pgmpy.models import BayesianModel
-from pgmpy.sampling import BayesianModelSampling
 
 def exact(exact_inference, variable, evidence = {}):
 	
