@@ -1,10 +1,10 @@
-Spotify audio features
-======================
+# Spotify audio features
 
 The aim of this project is to apply probabilistic reasoning to a Bayesian Network created using audio features of songs on Spotify.
 
-Packages
---------
+![network](images/network.png)
+
+## Packages
 
 `python 3.9.4`
 
