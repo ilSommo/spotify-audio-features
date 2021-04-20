@@ -1,5 +1,6 @@
-__version__ = '1.0.0-alpha.2'
+__version__ = '1.0.0-alpha.3'
 __author__ = 'Martino Pulici'
+
 
 import matplotlib.pyplot as plt
 import numpy as np
