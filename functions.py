@@ -72,7 +72,7 @@ def likelihood_weighted(
         Number of size.
     """
     text = probability_text(variable, evidence)
-    text += " – Likelihood weighted sampling (" + str(size) + " size)"
+    text += " – Likelihood weighted sampling (" + str(size) + " samples)"
     evidence_state = []
     for e in evidence.items():
         evidence_state.append(State(e[0], e[1]))
@@ -108,7 +108,7 @@ def rejection(approximate_inference, variable, evidence={}, size=10000):
         Number of size.
     """
     text = probability_text(variable, evidence)
-    text += " – Rejection sampling (" + str(size) + " size)"
+    text += " – Rejection sampling (" + str(size) + " samples)"
     evidence_state = []
     for e in evidence.items():
         evidence_state.append(State(e[0], e[1]))
