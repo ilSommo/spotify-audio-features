@@ -4,7 +4,7 @@ The aim of this project is to apply probabilistic reasoning to a Bayesian Networ
 
 In addition to Spotify audio features, the presence of each song in the Billboard Hot 100 Chart [1] is also taken into consideration.
 
-Even though it is not the focus of the present work, using the Billboard data in association with the Spotify features can be particularly interesting, since it can give an insight about the characteristics which are more relevant in making a song a commercial success. For an in-depth analysis, a work by Elena Georgieva, Marcella Suta, and Nicholas Burton [2, 3] is suggested.
+Even though it is not the focus of the present work, using the Billboard data in association with the Spotify features might be particularly interesting, since it can give an insight about the characteristics which are more relevant in making a song a commercial success. For an in-depth analysis, a work by Elena Georgieva, Marcella Suta, and Nicholas Burton [2, 3] is suggested.
 
 ## Features
 
@@ -26,19 +26,24 @@ The data of both the Spotify features and the Billboard ones are taken from the 
 
 ## Bayesian network
 
-Since not all variables are completely independent from each other, the following Bayesian network is used to represent the dependencies. The structure of the diagram is created using a mixture of correlation analysis and human intuition in evaluating the causal links.
+In theory, a full joint probability distribution can be used to inspect any probabilistic query of the given data. However, the problem can easily become computationally intractable, given the very high number of possible worlds. In order to simplify the problem, it is possible to exploit the mutual independence of some variables and a Bayesian network can be created. A Bayesian network is "a directed graph in which each node is annotated with quantitative probability information" [4]. In other words, a direct influence relationship is supposed to exist only between nodes which are connected by an arrow. In this case, the structure of the diagram is created using both correlation analysis and human intuition in evaluating the causal links.
 
 ![The Bayesian network](images/network.png)
 
 ## Code
 
-To start, the .csv file is imported as a pandas `DataFrame`. Then, in order to deal with the continuity of most of the variables, the data are discretized using the pandas `cut` function.
+To start, the .csv file is imported as a pandas `DataFrame`. Then, in order to deal with the continuity of most of the variables, the data are discretized using the pandas `cut` function. The number of bins for the discretization is chosen to be 4, but it can be easily changed through the `BINS` value.
 
 Next, a pgmpy `BayesianModel` is created specifying all the causal links shown in the network and it is then fit to the dataframe data using the `BayesianModel.fit` function.
 
+### Markov blankets
+
+An important property of Bayesian networks is that "a node is conditionally independent of all other nodes in the network, given its parents, children, and children’s parents" [4]. This group of variable is known as Markov blanket and can be computed through the `BayesianModel.get_markov_blanket` function: as an example, the Danceability Markov blanket returns the list `['ArtistScore', 'Energy', 'Chart', 'Speechiness', 'Valence', 'Loudness']`, whose correctness can be shown by looking at the network.
+
+
 ### Conditional probability distributions
 
-A conditional proability distriutions (CPD) can be calculated using the `BayesianModel.get_cpds` function: as an example, the Danceability CPD is shown.
+A conditional proability is given by the probability of a certin event given some prior knowledge. For example, one could ask the probability distribution of the Danceability variable, given that Speechiness is equal to 1, written as P(Danceability|Speechiness=1). Using the pgmpy package, CPDs can be calculated using the `BayesianModel.get_cpds` function: as an example, the Danceability CPD is shown.
 
 | Speechiness     | 0     | 1     | 2     | 3     |
 | --------------- | ----- | ----- | ----- | ----- |
@@ -47,21 +52,20 @@ A conditional proability distriutions (CPD) can be calculated using the `Bayesia
 | Danceability(2) | 0.508 | 0.411 | 0.688 | 0.522 |
 | Danceability(3) | 0.176 | 0.458 | 0.125 | 0.174 |
 
-### Markov blankets
+However, the `BayesianModel.get_cpds` function can only return information of CPDs where the given state is made up of variables which are parents of the query variable. For example, if one wants to know the CPD of P(Valence|Chart=1), the `BayesianModel.get_cpds` would not work, since the CPD of the Valence variable uses its parents (i.e. Energy and Danceability) as conditioning variables. In order to compute CPD of other variable combinations, inference methods must be used.
 
-Markov blankets can be computed through the `BayesianModel.get_markov_blanket` function: as an example, the Danceability Markov blanket returns the list `['ArtistScore', 'Energy', 'Chart', 'Speechiness', 'Valence', 'Loudness']`, whose correctness can be shown by again looking at the network.
 
 ### Inferences
 
-Three different kinds of inference are tested and compared. The code used for each inference method can be found in the `functions.py` file.
+In this work, three different kinds of inference are tested and compared. The code used for each inference method can be found in the `functions.py` file.
 
-The first inference method is exact inference, using in particular the variable elimination method, which consists in "do[ing] the calculation once and sav[ing] the results for later use" [4].
+The first method is exact inference, using in particular the variable elimination method, which consists in "do[ing] the calculation once and sav[ing] the results for later use" [4].
 
-The second method is the rejection sampling method, an approximate inference algorithm which "generates samples from the prior distribution specified by the network. Then, it rejects all those that do not match the evidence." [4].
+The second method is the rejection sampling method, an approximate inference algorithm which "generates samples from the prior distribution specified by the network" [4] and "rejects all those that do not match the evidence" [4].
 
 The last algorithm is another approximate inference method, likelihood weighted sampling. This algortithm "avoids the inefficiency of rejection sampling by generating only events that are consistent with the evidence" [4].
 
-The CPDs of P(Valence | Chart=1) computed using the three methods are:
+The CPDs of P(Valence|Chart=1) computed using the three methods are shown in the following table.
 
 |            | Exact | Rejection | Weighted |
 | ---------- | ----- | --------- | -------- |
@@ -72,7 +76,7 @@ The CPDs of P(Valence | Chart=1) computed using the three methods are:
 
 ### Graphs
 
-Since rejection sampling and likelihood weighted sampling are numerical computations, their accuracy depends on the number of samples which are calculated. To compare their performance with the exact values, two different graphs are plotted. In both cases the x axis represents the number of samples in logarithmic scale, while the y axes of the two graphs show respectively the absolute probability and the difference from the exact value. It is clear from the plots that as the sampling size increases, the approximate estimation converge to the reference exact value, as expected.
+Since rejection sampling and likelihood weighted sampling are numerical computations, their accuracy depends on the number of samples which are calculated. To compare their performance with the exact values, two different graphs for P(Valence|Chart=1) are plotted. In both cases the x axis represents the number of samples in logarithmic scale, while the y axes of the two graphs show respectively the absolute probability and the difference from the exact value. The number at the top of each subplot represents a different Valence value. It is clear from the plots that as the sampling size increases the approximate estimation converge to the reference exact value, as expected.
 
 ![Probabilities comparison](images/probabilities.png)
 
