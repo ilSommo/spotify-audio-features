@@ -18,7 +18,7 @@ Even though it is not the focus of the present work, using the Billboard data in
 - Liveness: whether the song is performed live
 - Tempo: beats per minute
 - Chart: whether the song ended up in the Billboard Hot 100 Chart
-- Artist score: whether the artist has had a previous hit
+- ArtistScore: whether the artist has had a previous hit
 
 All features are expressed with a value ranging from 0 to 1, with the exception of loudness and tempo.
 
@@ -36,11 +36,6 @@ To start, the .csv file is imported as a pandas `DataFrame`. Then, in order to d
 
 Next, a pgmpy `BayesianModel` is created specifying all the causal links shown in the network and it is then fit to the dataframe data using the `BayesianModel.fit` function.
 
-### Markov blankets
-
-An important property of Bayesian networks is that "a node is conditionally independent of all other nodes in the network, given its parents, children, and children’s parents" [4]. This group of variable is known as Markov blanket and can be computed through the `BayesianModel.get_markov_blanket` function: as an example, the Danceability Markov blanket returns the list `['ArtistScore', 'Energy', 'Chart', 'Speechiness', 'Valence', 'Loudness']`, whose correctness can be shown by looking at the network.
-
-
 ### Conditional probability distributions
 
 A conditional proability is given by the probability of a certin event given some prior knowledge. For example, one could ask the probability distribution of the Danceability variable, given that Speechiness is equal to 1, written as P(Danceability|Speechiness=1). Using the pgmpy package, CPDs can be calculated using the `BayesianModel.get_cpds` function: as an example, the Danceability CPD is shown.
@@ -54,6 +49,21 @@ A conditional proability is given by the probability of a certin event given som
 
 However, the `BayesianModel.get_cpds` function can only return information of CPDs where the given state is made up of variables which are parents of the query variable. For example, if one wants to know the CPD of P(Valence|Chart=1), the `BayesianModel.get_cpds` would not work, since the CPD of the Valence variable uses its parents (i.e. Energy and Danceability) as conditioning variables. In order to compute CPD of other variable combinations, inference methods must be used.
 
+### Variable independence
+
+To efficiently calculate inferences, it is important to exploit variable indipendence. In general, "each variable is conditionally independent of its non-descendants, given its parents" [4]. For example, Danceability can be considered independent of Energy (a non-descendant), given Speechiness (its parent). This fact can be checked using the `BayesianModel.is_active_trail` function, which returns True if the variables are dependent and False if they are independent. The two lines
+```python
+print(model.is_active_trail('Danceability', 'Energy'))
+print(model.is_active_trail('Danceability', 'Energy', observed='Speechiness'))
+```
+respectively print True and False, meaning that Danceability and Energy would not be independent if Speechiness were not given.
+
+Another important property of Bayesian networks is that "a node is conditionally independent of all other nodes in the network, given its parents, children, and children’s parents" [4]. This group of variable is known as Markov blanket and can be computed through the `BayesianModel.get_markov_blanket` function: as an example, the Danceability Markov blanket returns the list `['ArtistScore', 'Energy', 'Chart', 'Speechiness', 'Valence', 'Loudness']`, whose correctness can be shown by looking at the network. The two lines
+```python
+print(model.is_active_trail('Danceability', 'Liveness'))
+print(model.is_active_trail('Danceability', 'Liveness', observed=model.get_markov_blanket('Danceability')))
+```
+respectively print True and False, showing that Danceability and Liveness become independent when the Markov blanket for Danceability is given.
 
 ### Inferences
 
