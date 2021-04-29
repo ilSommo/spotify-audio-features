@@ -26,7 +26,7 @@ The data of both the Spotify features and the Billboard ones are taken from the 
 
 ## Bayesian network
 
-In theory, a full joint probability distribution can be used to inspect any probabilistic query of the given data. However, the problem can easily become computationally intractable, given the very high number of possible worlds. In order to simplify the problem, it is possible to exploit the mutual independence of some variables and a Bayesian network can be created. A Bayesian network is "a directed graph in which each node is annotated with quantitative probability information" [4]. In other words, a direct influence relationship is supposed to exist only between nodes which are connected by an arrow. In this case, the structure of the diagram is created using both correlation analysis and human intuition in evaluating the causal links.
+In theory, a full joint probability distribution can be used to inspect any probabilistic query of the given data. However, the problem can easily become computationally intractable, given the very high number of possible worlds. In order to simplify the problem, it is possible to exploit the mutual independence of some variables and create a Bayesian network. A Bayesian network is "a directed graph in which each node is annotated with quantitative probability information" [4]. In other words, a direct influence relationship is supposed to exist only between nodes which are connected by an arrow. In this case, the structure of the diagram is created using both correlation analysis and human intuition in evaluating the causal links.
 
 ![The Bayesian network](images/network.png)
 
@@ -38,7 +38,7 @@ Next, a pgmpy `BayesianModel` is created specifying all the causal links shown i
 
 ### Conditional probability distributions
 
-A conditional proability is given by the probability of a certin event given some prior knowledge. For example, one could ask the probability distribution of the Danceability variable, given that Speechiness is equal to 1, written as P(Danceability|Speechiness=1). Using the pgmpy package, CPDs can be calculated using the `BayesianModel.get_cpds` function: as an example, the Danceability CPD is shown.
+A conditional proability is defined as the probability of a certin event given some prior knowledge. For example, one could ask the probability distribution of the Danceability variable, given that Speechiness is equal to 1, written as P(Danceability|Speechiness=1). Using the pgmpy package, CPDs can be calculated with the `BayesianModel.get_cpds` function. As an example, the Danceability CPD is shown.
 
 | Speechiness     | 0     | 1     | 2     | 3     |
 | --------------- | ----- | ----- | ----- | ----- |
@@ -47,7 +47,7 @@ A conditional proability is given by the probability of a certin event given som
 | Danceability(2) | 0.508 | 0.411 | 0.688 | 0.522 |
 | Danceability(3) | 0.176 | 0.458 | 0.125 | 0.174 |
 
-However, the `BayesianModel.get_cpds` function can only return information of CPDs where the given state is made up of variables which are parents of the query variable. For example, if one wants to know the CPD of P(Valence|Chart=1), the `BayesianModel.get_cpds` would not work, since the CPD of the Valence variable uses its parents (i.e. Energy and Danceability) as conditioning variables. In order to compute CPD of other variable combinations, inference methods must be used.
+Unfortunately, the `BayesianModel.get_cpds` function only returns information of CPDs where the given state is made up of variables which are parents of the query variable. For example, if one wants to know the CPD of P(Valence|Chart=1), the `BayesianModel.get_cpds` would not work, since the CPD of the Valence variable uses its parents (i.e. Energy and Danceability) as conditioning variables. In order to compute CPD of other variable combinations, inference methods must be used.
 
 ### Variable independence
 
@@ -56,7 +56,7 @@ To efficiently calculate inferences, it is important to exploit variable indipen
 print(model.is_active_trail('Danceability', 'Energy'))
 print(model.is_active_trail('Danceability', 'Energy', observed='Speechiness'))
 ```
-respectively print True and False, meaning that Danceability and Energy would not be independent if Speechiness were not given.
+respectively print True and False, meaning that Danceability and Energy are not independent if Speechiness is not given.
 
 Another important property of Bayesian networks is that "a node is conditionally independent of all other nodes in the network, given its parents, children, and children’s parents" [4]. This group of variable is known as Markov blanket and can be computed through the `BayesianModel.get_markov_blanket` function: as an example, the Danceability Markov blanket returns the list `['ArtistScore', 'Energy', 'Chart', 'Speechiness', 'Valence', 'Loudness']`, whose correctness can be shown by looking at the network. The two lines
 ```python
@@ -67,15 +67,15 @@ respectively print True and False, showing that Danceability and Liveness become
 
 ### Inferences
 
-In this work, three different kinds of inference are tested and compared. The code used for each inference method can be found in the `functions.py` file.
+In this work, three different kinds of inference are tested and compared. The code used for each inference method and the corresponding documentation can be found in the `functions.py` file.
 
-The first method is exact inference, using in particular the variable elimination method, which consists in "do[ing] the calculation once and sav[ing] the results for later use" [4].
+The first method is exact inference, spceifically the variable elimination implementation, which consists in "do[ing] the calculation once and sav[ing] the results for later use" [4].
 
 The second method is the rejection sampling method, an approximate inference algorithm which "generates samples from the prior distribution specified by the network" [4] and "rejects all those that do not match the evidence" [4].
 
 The last algorithm is another approximate inference method, likelihood weighted sampling. This algortithm "avoids the inefficiency of rejection sampling by generating only events that are consistent with the evidence" [4].
 
-The CPDs of P(Valence|Chart=1) computed using the three methods are shown in the following table.
+The CPDs for P(Valence|Chart=1) computed using the three methods are shown in the following table.
 
 |            | Exact | Rejection | Weighted |
 | ---------- | ----- | --------- | -------- |
@@ -94,7 +94,7 @@ Since rejection sampling and likelihood weighted sampling are numerical computat
 
 ## Bibliography
 
-[1] Billboard Media. 2021. The Hot 100 Chart. (April 2001). Retrieved April 20, 2021 from https://www.billboard.com/charts/hot-100
+[1] Billboard Media. 2021. The Hot 100 Chart. (April 2021). Retrieved April 20, 2021 from https://www.billboard.com/charts/hot-100
 
 [2] Elena Georgieva, Marcella Suta, and Nicholas Burton. 2018. HitPredict: Predicting Hit Songs Using Spotify Data. Retrieved April 20, 2021 from http://cs229.stanford.edu/proj2018/report/16.pdf
 
