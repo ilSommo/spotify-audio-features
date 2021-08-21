@@ -4,12 +4,14 @@ The aim of this project is to apply probabilistic reasoning to a Bayesian Networ
 
 ![network](images/network.png)
 
-## Packages
+## Setup
 
-`python 3.9.4`
+### To run
 
-`jupyter 1.0.0`  
-`matplotlib 3.4.1`  
-`numpy 1.20.2`  
-`pandas 1.2.4`  
-`pgmpy 0.1.14`
+```console
+$ make setup
+```
+
+## Documentation
+
+To browse documentation, open `docs/index.html` with a web browser.
