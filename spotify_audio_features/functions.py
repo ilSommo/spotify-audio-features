@@ -1,4 +1,4 @@
-__version__ = '1.0.0-rc'
+__version__ = '1.0.0-rc.1'
 __author__ = 'Martino Pulici'
 
 
@@ -113,7 +113,8 @@ def weighted(
     evidence_state = []
     for e in evidence.items():
         evidence_state.append(State(e[0], e[1]))
-    query = approximate_inference.likelihood_weighted_sample(evidence=evidence_state, size=size)
+    query = approximate_inference.likelihood_weighted_sample(
+        evidence=evidence_state, size=size)
     state_names = sorted(query[variable].unique())
     cardinality = len(state_names)
     probabilities = []
