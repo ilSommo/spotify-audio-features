@@ -1,4 +1,4 @@
-__version__ = '1.0.0-rc.1'
+__version__ = '1.0.0'
 __author__ = 'Martino Pulici'
 
 
@@ -94,7 +94,7 @@ def exact(exact_inference, variable, evidence={}):
     # CPD to print
     cpd = TabularCPD(variable, cardinality, np.reshape(
         probabilities, (cardinality, 1)), state_names=state_names)
-    
+
     # Print text and CPD
     print(text)
     print(cpd)
@@ -206,7 +206,7 @@ def graph_points(
             np.log10(final_size),
             num=experiments,
             dtype='<i8'))
-    
+
     # Exact inference query
     exact_query = exact_inference.query(
         [variable], evidence, show_progress=False)
