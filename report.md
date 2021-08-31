@@ -10,17 +10,17 @@ Despite not being the focus of the present work, using the Billboard data in ass
 
 The following features are taken into account for each song.
 
-- Loudness: volume in dB
-- Energy: perceived energy
-- Danceability: regular and loud beat
-- Acousticness: presence of acoustic instruments
-- Valence: perceived cheerfulness
-- Speechiness: amount of spoken words
-- Instrumentalness: absence of voice
-- Liveness: whether the song is performed live
-- Tempo: beats per minute
-- Chart: whether the song ended up in the Billboard Hot 100 Chart
-- ArtistScore: whether the artist has had a previous hit
+* Loudness: volume in dB
+* Energy: perceived energy
+* Danceability: regular and loud beat
+* Acousticness: presence of acoustic instruments
+* Valence: perceived cheerfulness
+* Speechiness: amount of spoken words
+* Instrumentalness: absence of voice
+* Liveness: whether the song is performed live
+* Tempo: beats per minute
+* Chart: whether the song ended up in the Billboard Hot 100 Chart
+* ArtistScore: whether the artist has had a previous hit
 
 All features are expressed with a value ranging from 0 to 1, except for loudness and tempo.
 
@@ -107,10 +107,10 @@ Since rejection sampling and likelihood weighted sampling are numerical computat
 
 ## Bibliography
 
-[1] Billboard Media. 2021. The Hot 100 Chart. (April 2021). Retrieved April 20, 2021 from https://www.billboard.com/charts/hot-100
+[1] "The Hot 100 Chart." Billboard Media. https://www.billboard.com/charts/hot-100 (accessed Sept. 1, 2021).
 
-[2] Elena Georgieva, Marcella Suta, and Nicholas Burton. 2018. HitPredict: Predicting Hit Songs Using Spotify Data. Retrieved April 20, 2021 from http://cs229.stanford.edu/proj2018/report/16.pdf
+[2] E. Georgieva, M. Suta, and N. Burton, "HitPredict: Predicting Hit Songs Using Spotify Data", Stanford University, Stanford, CA, USA, 2018. Accessed: Sept. 1, 2021. [Online]. Available: http://cs229.stanford.edu/proj2018/report/16.pdf
 
-[3] Elena Georgieva, Marcella Suta, and Nicholas Burton. 2018. HitPredict: Using Spotify Data to Predict Billboard Hits. Retrieved April 20, 2021 from https://ccrma.stanford.edu/~egeorgie/HitPredict/ICML2020.pdf
+[3] E. Georgieva, M. Suta, and N. Burton, "HitPredict: Using Spotify Data to Predict Billboard Hits", Stanford University, Stanford, CA, USA, 2018. Accessed: Sept. 1, 2021. [Online]. Available: https://ccrma.stanford.edu/~egeorgie/HitPredict/ICML2020.pdf
 
-[4] Stuart J. Russell and Peter Norvig. 2010. *Artificial Intelligence: A Modern Approach* (3rd. ed.). Pearson Education, Upper Saddle River, New Jersey.
+[4] S. J. Russell and P. Norvig, "Probabilistic Reasoning", in *Artificial Intelligence*, A Modern Approach, 3rd ed. Upper Saddle River, NJ, USA: Pearson Education, 2009, ch. 14, pp. 510–565.

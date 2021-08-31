@@ -9,10 +9,10 @@ else ifneq (,$(findstring hotfix-,$(BRANCH)))
 VERSION := $(subst hotfix-,,$(BRANCH))
 endif
 
-bump:
-	sed -i '' 's/__version__ = .*/__version__ = '\'$(VERSION)\''/' **/*.py
+bump: $(shell find . -name "*.py")
+	sed -i '' 's/__version__ = .*/__version__ = '\'$(VERSION)\''/' $^
 	sed -i '' 's/__version__ = .*/__version__ = '\'$(VERSION)\''\\n",/' spotify-audio-features.ipynb
-	autopep8 -i -a -a **/*.py
+	autopep8 -i -a -a $^
 	pdoc -o ./docs --docformat numpy spotify_audio_features
 	pip freeze > requirements.txt
 	git add .

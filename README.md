@@ -6,10 +6,14 @@ The aim of this project is to apply probabilistic reasoning to a Bayesian Networ
 
 ## Setup
 
-### To run
-
 ```console
 $ make setup
+```
+
+## Run
+
+```console
+$ jupyter notebook spotify-audio-features.ipynb
 ```
 
 ## Documentation
