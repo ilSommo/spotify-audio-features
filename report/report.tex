@@ -2,6 +2,7 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
+\usepackage{spverbatim}
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage[capitalise]{cleveref}
@@ -11,6 +12,7 @@
 \usepackage[style=ieee, backend=biber]{biblatex}
 \usepackage{booktabs}
 \addbibresource{bib.bib}
+
 
 \onehalfspacing
 
@@ -70,7 +72,7 @@ The following features are taken into account for each song:
 
 All features are expressed with a value ranging from 0 to 1, except for loudness and tempo.
 
-The data of both the Spotify features and the Billboard ones are taken from the \verb|csv| file included in the work by Elena Georgieva, Marcella Suta, and Nicholas Burton \cite{hitpredict-presentation, hitpredict-report}.
+The data of both the Spotify features and the Billboard ones are taken from the \spverb|csv| file included in the work by Elena Georgieva, Marcella Suta, and Nicholas Burton \cite{hitpredict-presentation, hitpredict-report}.
 
 
 \section{Bayesian network}
@@ -87,14 +89,14 @@ In theory, a full joint probability distribution can be used to inspect any prob
 
 \section{Code}
 
-To start, the \verb|csv| file is imported as a pandas \verb|DataFrame|. Then, to deal with the continuity of most of the variables, the data are discretized using the pandas \verb|cut| function. The number of bins for the discretization is chosen to be 4, but it can be easily changed through the \verb|BINS| value.
+To start, the \spverb|csv| file is imported as a pandas \spverb|DataFrame|. Then, to deal with the continuity of most of the variables, the data are discretized using the pandas \spverb|cut| function. The number of bins for the discretization is chosen to be 4, but it can be easily changed through the \spverb|BINS| value.
 
-Next, a pgmpy \verb|BayesianModel| is created specifying all the causal links shown in the network and it is then fit to the dataframe data using the \verb|BayesianModel.fit| function.
+Next, a pgmpy \spverb|BayesianModel| is created specifying all the causal links shown in the network and it is then fit to the dataframe data using the \spverb|BayesianModel.fit| function.
 
 
 \subsection{Conditional probability distributions}
 
-A conditional probability is defined as the probability of a certain event given some prior knowledge. For example, one could ask the probability distribution of the Danceability variable, given that Speechiness is equal to 1, written as $P\left(\mathrm{Danceability} | \mathrm{Speechiness} = 1\right)$. Using the pgmpy package, CPDs can be calculated with the \verb|BayesianModel.get_cpds| function. As an example, the Danceability CPD is shown:
+A conditional probability is defined as the probability of a certain event given some prior knowledge. For example, one could ask the probability distribution of the Danceability variable, given that Speechiness is equal to 1, written as $P\left(\mathrm{Danceability} | \mathrm{Speechiness} = 1\right)$. Using the pgmpy package, CPDs can be calculated with the \spverb|BayesianModel.get_cpds| function. As an example, the Danceability CPD is shown:
 \begin{center}
     \begin{tabular}{lrrrr}
         \toprule
@@ -108,18 +110,20 @@ A conditional probability is defined as the probability of a certain event given
     \end{tabular}
 \end{center}
 
-Unfortunately, the \verb|BayesianModel.get_cpds| function only returns information of CPDs where the given state is made up of variables that are parents of the query variable. For example, if one wants to know the CPD of $P\left(\mathrm{Valence} | \mathrm{Chart} = 1\right)$, the \verb|BayesianModel.get_cpds| would not work, since the CPD of the Valence variable uses its parents (i.e. Energy and Danceability) as conditioning variables. To compute CPDs of other variable combinations, inference methods must be used.
+Unfortunately, the \spverb|BayesianModel.get_cpds| function only returns information of CPDs where the given state is made up of variables that are parents of the query variable. For example, if one wants to know the CPD of $P\left(\mathrm{Valence} | \mathrm{Chart} = 1\right)$, the \spverb|BayesianModel.get_cpds| would not work, since the CPD of the Valence variable uses its parents (i.e. Energy and Danceability) as conditioning variables. To compute CPDs of other variable combinations, inference methods must be used.
 
 
 \subsection{Variable independence}
 
-To efficiently calculate inferences, it is important to exploit variable independence. In general, ``each variable is conditionally independent of its non-descendants, given its parents'' \cite{probabilistic-reasoning}. For example, Danceability can be considered independent of Energy (a non-descendant), given Speechiness (its parent). This fact can be checked using the \verb|BayesianModel.is_active_trail| function, which returns \verb|True| if the variables are dependent and \verb|False| if they are independent. These two lines respectively print True and False, meaning that Danceability and Energy are not independent if Speechiness is not given:
+To efficiently calculate inferences, it is important to exploit variable independence. In general, ``each variable is conditionally independent of its non-descendants, given its parents'' \cite{probabilistic-reasoning}. For example, Danceability can be considered independent of Energy (a non-descendant), given Speechiness (its parent). This fact can be checked using the \spverb|BayesianModel.is_active_trail| function, which returns \spverb|True| if the variables are dependent and \spverb|False| if they are independent. These two lines respectively print True and False, meaning that Danceability and Energy are not independent if Speechiness is not given:
 \begin{minted}[autogobble, breaklines, linenos]{python}
     print(model.is_active_trail('Danceability', 'Energy'))
     print(model.is_active_trail('Danceability', 'Energy', observed='Speechiness'))
 \end{minted}
 
-Another important property of Bayesian networks is that ``a node is conditionally independent of all other nodes in the network, given its parents, children, and children’s parents'' \cite{probabilistic-reasoning}. This group of variable is known as Markov blanket and can be computed through the \verb|BayesianModel.get_markov_blanket| function: as an example, the Danceability Markov blanket returns the list \verb|['ArtistScore', 'Energy', 'Chart', 'Speechiness', 'Valence', 'Loudness']|, whose correctness can be shown by looking at the network. These two lines respectively print True and False, showing that Danceability and Liveness become independent when the Markov blanket for Danceability is given:
+Another important property of Bayesian networks is that ``a node is conditionally independent of all other nodes in the network, given its parents, children, and children’s parents'' \cite{probabilistic-reasoning}.
+
+This group of variable is known as Markov blanket and can be computed through the \spverb|BayesianModel.get_markov_blanket| function: as an example, the Danceability Markov blanket returns the list \spverb|['ArtistScore', 'Energy', 'Chart', 'Speechiness', 'Valence', 'Loudness']|, whose correctness can be shown by looking at the network. These two lines respectively print True and False, showing that Danceability and Liveness become independent when the Markov blanket for Danceability is given:
 \begin{minted}[autogobble, breaklines, linenos]{python}
     print(model.is_active_trail('Danceability', 'Liveness'))
     print(model.is_active_trail('Danceability', 'Liveness', observed=model.get_markov_blanket('Danceability')))
@@ -128,7 +132,7 @@ Another important property of Bayesian networks is that ``a node is conditionall
 
 \subsection{Inferences}
 
-In this work, three different kinds of inference are tested and compared. The code used for each inference method and the corresponding documentation can be found in the \verb|functions.py| file.
+In this work, three different kinds of inference are tested and compared. The code used for each inference method and the corresponding documentation can be found in the \spverb|functions.py| file.
 
 The first method is exact inference, specifically the variable elimination implementation, which consists in ``do[ing] the calculation once and sav[ing] the results for later use'' \cite{probabilistic-reasoning}.
 
@@ -136,7 +140,60 @@ The second method is the rejection sampling method, an approximate inference alg
 
 The last algorithm is another approximate inference method, likelihood weighted sampling. This algorithm ``avoids the inefficiency of rejection sampling by generating only events that are consistent with the evidence'' \cite{probabilistic-reasoning}.
 
-The CPDs for $P\left(\mathrm{Valence} | \mathrm{Chart} = 1\right)$ computed using the three methods are shown in the following table:
+To start, some simple inferences are computed to check if the model makes sense. Since these conditional probabilities are produced by mere direct conditioning, only exact inference is used.
+
+The first influence to be looked at is that of ArtistScore on Chart:
+\begin{center}
+    \begin{tabular}{lrr}
+        \toprule
+        ArtistScore          & 0     & 1        \\ 
+        \midrule
+        $\mathrm{Chart} = 0$ & 0.694 & 0.248    \\ 
+        $\mathrm{Chart} = 1$ & 0.306 & 0.752    \\ 
+        \bottomrule
+    \end{tabular}
+\end{center}
+As one may expect, whether an artist has had a previous hit (i.e. if they are famous) brings the probability of a song of theirs to be in the chart from around $30\%$ to more than $75\%$.
+
+Another big influence on the probability of a song to hit the chart is known to be its Loudness:
+\begin{center}
+    \begin{tabular}{lrrrr}
+        \toprule
+        Loudness             & 0     & 1     & 2     & 3     \\
+        \midrule
+        $\mathrm{Chart} = 0$ & 0.811 & 0.876 & 0.692 & 0.551 \\
+        $\mathrm{Chart} = 1$ & 0.189 & 0.124 & 0.308 & 0.449 \\
+        \bottomrule
+    \end{tabular}
+\end{center}
+Again, the model clearly matches expectations: going from $\mathrm{Loudness} = 0$ to $\mathrm{Loudness} = 3$, the probability of a song to hit the charts goes from less than $20\%$ to almost $50\%$.
+
+The last CPDs used to check the model are that of Energy given Loudness:
+\begin{center}
+    \begin{tabular}{lrrrr}
+        \toprule
+        Loudness                & 0     & 1     & 2     & 3     \\
+        \midrule
+        $\mathrm{Energy} = 0$   & 0.795 & 0.899 & 0.149 & 0.004 \\
+        $\mathrm{Energy} = 1$   & 0.068 & 0.075 & 0.436 & 0.099 \\
+        $\mathrm{Energy} = 2$   & 0.068 & 0.013 & 0.341 & 0.370 \\
+        $\mathrm{Energy} = 3$   & 0.068 & 0.013 & 0.073 & 0.527 \\
+        \bottomrule
+    \end{tabular}
+\end{center}
+This time, the influence is even more evident: when Loudness is between 0 and 1, the probability of Energy being 0 goes from 80 to $90\%$. On the contrary, a Loudness of 3 grants more than $50\%$ of the songs to have an Energy of 3, as expected.
+
+To conclude, it is calculated that
+\[
+    P\left(\mathrm{Chart} = 1 | \mathrm{ArtistScore} = 1, \mathrm{Danceability} = 3, \mathrm{Loudness} = 3\right) \approx 77\%,
+\]
+which is reasonable, given that a danceable and loud song from a famous artist is exactly what is expected to be found in the hit chart. To contrast it is found that
+\[
+    P\left(\mathrm{Chart} = 1 | \mathrm{ArtistScore} = 0, \mathrm{Danceability} = 0, \mathrm{Loudness} = 0\right) = 0\%,
+\]
+again supporting the accuracy of the proposed Bayesian network.
+
+After having checked the likeliness of the model, the influence of Chart on Valence (which are not directly connected) is investigated exploiting the power of the Bayesian network. The CPDs for $P\left(\mathrm{Valence} | \mathrm{Chart} = 1\right)$ computed using the three methods are shown in the following table:
 \begin{center}
     \begin{tabular}{lrrr}
         \toprule
