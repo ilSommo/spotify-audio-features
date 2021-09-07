@@ -22,7 +22,7 @@
 
 \title{Spotify Audio Features}
 \author{Martino Mare Lakota Pulici}
-\date{September 6, 2021}
+\date{September 7, 2021}
 \maketitle
 \begin{center}
     \fbox{\includegraphics[width=0.618\textwidth]{images/network.png}}
@@ -96,7 +96,7 @@ Next, a pgmpy \spverb|BayesianModel| is created specifying all the causal links 
 
 \subsection{Conditional probability distributions}
 
-A conditional probability is defined as the probability of a certain event given some prior knowledge. For example, one could ask the probability distribution of the Danceability variable, given that Speechiness is equal to 1, written as $P\left(\mathrm{Danceability} | \mathrm{Speechiness} = 1\right)$. Using the pgmpy package, CPDs can be calculated with the \spverb|BayesianModel.get_cpds| function. As an example, the Danceability CPD is shown:
+A conditional probability is defined as the probability of a certain event given some prior knowledge. For example, one could ask the probability distribution of the Danceability variable, given that Speechiness is equal to 1, written as $P\left(\mathrm{Danceability} | \mathrm{Speechiness} = 1\right)$. Using the pgmpy package, a Conditional Probability Distribution (CPD) table can be calculated with the \spverb|BayesianModel.get_cpds| function. As an example, the Danceability CPDs are shown:
 \begin{center}
     \begin{tabular}{lrrrr}
         \toprule
@@ -110,12 +110,12 @@ A conditional probability is defined as the probability of a certain event given
     \end{tabular}
 \end{center}
 
-Unfortunately, the \spverb|BayesianModel.get_cpds| function only returns information of CPDs where the given state is made up of variables that are parents of the query variable. For example, if one wants to know the CPD of $P\left(\mathrm{Valence} | \mathrm{Chart} = 1\right)$, the \spverb|BayesianModel.get_cpds| would not work, since the CPD of the Valence variable uses its parents (i.e. Energy and Danceability) as conditioning variables. To compute CPDs of other variable combinations, inference methods must be used.
+Unfortunately, the \spverb|BayesianModel.get_cpds| function only returns information of CPDs where the given state is made up of variables that are parents of the query variable. For example, if one wants to know the CPD of $P\left(\mathrm{Valence} | \mathrm{Chart} = 1\right)$, the \spverb|BayesianModel.get_cpds| would not help, since the CPD table of the Valence variable uses its parents (i.e. Energy and Danceability) as conditioning variables. To compute CPDs of other variable combinations, inference methods must be used.
 
 
 \subsection{Variable independence}
 
-To efficiently calculate inferences, it is important to exploit variable independence. In general, ``each variable is conditionally independent of its non-descendants, given its parents'' \cite{probabilistic-reasoning}. For example, Danceability can be considered independent of Energy (a non-descendant), given Speechiness (its parent). This fact can be checked using the \spverb|BayesianModel.is_active_trail| function, which returns \spverb|True| if the variables are dependent and \spverb|False| if they are independent. These two lines respectively print True and False, meaning that Danceability and Energy are not independent if Speechiness is not given:
+To efficiently calculate inferences, it is important to exploit variable independence. In general, ``each variable is conditionally independent of its non-descendants, given its parents'' \cite{probabilistic-reasoning}. For example, Danceability can be considered independent of Energy (a non-descendant), given Speechiness (its parent). This fact can be checked using the \spverb|BayesianModel.is_active_trail| function, which returns \spverb|True| if the variables are dependent and \spverb|False| if they are independent. These two lines respectively print \spverb|True| and \spverb|False|, meaning that Danceability and Energy are not independent if Speechiness is not given:
 \begin{minted}[autogobble, breaklines, linenos]{python}
     print(model.is_active_trail('Danceability', 'Energy'))
     print(model.is_active_trail('Danceability', 'Energy', observed='Speechiness'))
@@ -123,7 +123,7 @@ To efficiently calculate inferences, it is important to exploit variable indepen
 
 Another important property of Bayesian networks is that ``a node is conditionally independent of all other nodes in the network, given its parents, children, and children’s parents'' \cite{probabilistic-reasoning}.
 
-This group of variable is known as Markov blanket and can be computed through the \spverb|BayesianModel.get_markov_blanket| function: as an example, the Danceability Markov blanket returns the list \spverb|['ArtistScore', 'Energy', 'Chart', 'Speechiness', 'Valence', 'Loudness']|, whose correctness can be shown by looking at the network. These two lines respectively print True and False, showing that Danceability and Liveness become independent when the Markov blanket for Danceability is given:
+This group of variable is known as Markov blanket and can be computed through the \spverb|BayesianModel.get_markov_blanket| function: as an example, the Danceability Markov blanket returns the list \spverb|['ArtistScore', 'Energy', 'Chart', 'Speechiness', 'Valence', 'Loudness']|, whose correctness can be shown by looking at the network. These two lines respectively print \spverb|True| and \spverb|False|, showing that Danceability and Liveness become independent when the Markov blanket for Danceability is given:
 \begin{minted}[autogobble, breaklines, linenos]{python}
     print(model.is_active_trail('Danceability', 'Liveness'))
     print(model.is_active_trail('Danceability', 'Liveness', observed=model.get_markov_blanket('Danceability')))
@@ -132,7 +132,7 @@ This group of variable is known as Markov blanket and can be computed through th
 
 \subsection{Inferences}
 
-In this work, three different kinds of inference are tested and compared. The code used for each inference method and the corresponding documentation can be found in the \spverb|functions.py| file.
+In this work, three different kinds of inference are tested and compared. The code used for each inference method can be found in the \spverb|functions.py| file, while the corresponding documentation is in the \spverb|docs| directory.
 
 The first method is exact inference, specifically the variable elimination implementation, which consists in ``do[ing] the calculation once and sav[ing] the results for later use'' \cite{probabilistic-reasoning}.
 
@@ -242,7 +242,7 @@ Since rejection sampling and likelihood weighted sampling are numerical computat
     \label{fig:differences}
 \end{figure}
 
-In both cases, the x-axis represents the number of samples on a logarithmic scale, while the y-axes of the two graphs show respectively the absolute probability and the difference from the exact probability value. The number at the top of each subplot represents a different Valence value. It is clear from the plots that as the sampling size increases the approximate estimations converge to the reference exact value, as expected.
+In both cases, the x-axis represents the number of samples on a logarithmic scale, while the y-axes of the two graphs show the absolute probability and the difference from the exact probability value respectively. The number at the top of each subplot represents a different Valence value. It is clear from the plots that as the sampling size increases the approximate estimations converge to the reference exact value, as expected.
 
 
 \clearpage
