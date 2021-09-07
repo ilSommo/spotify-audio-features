@@ -2,7 +2,7 @@
 
 The aim of this project is to apply probabilistic reasoning to a Bayesian Network created using audio features of songs on Spotify.
 
-![network](images/network.png)
+![network](report/images/network.png)
 
 ## Setup
 

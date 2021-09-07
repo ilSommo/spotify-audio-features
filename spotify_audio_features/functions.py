@@ -1,4 +1,4 @@
-__version__ = '1.2.0'
+__version__ = '1.2.1'
 __author__ = 'Martino Pulici'
 
 
@@ -66,7 +66,7 @@ def diff_graph(
                 rejection_plot,
                 weighted_plot])
     # Save plot
-    plt.savefig('images/differences.png', facecolor='white')
+    plt.savefig('report/imagesdifferences.png', facecolor='white')
     # Show plot
     plt.show()
 
@@ -158,7 +158,7 @@ def graph(
                 rejection_plot,
                 weighted_plot])
     # Save plot
-    plt.savefig('images/probabilities.png', facecolor='white')
+    plt.savefig('report/imagesprobabilities.png', facecolor='white')
     # Show plot
     plt.show()
 
