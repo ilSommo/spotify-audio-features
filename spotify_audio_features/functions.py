@@ -1,4 +1,4 @@
-__version__ = '1.3.0'
+__version__ = '1.3.1'
 __author__ = 'Martino Pulici'
 
 
@@ -65,8 +65,6 @@ def diff_graph(
                 exact_plot,
                 rejection_plot,
                 weighted_plot])
-    # Save plot
-    plt.savefig('report/imagesdifferences.png', facecolor='white')
     # Show plot
     plt.show()
 
@@ -157,8 +155,6 @@ def graph(
                 exact_plot,
                 rejection_plot,
                 weighted_plot])
-    # Save plot
-    plt.savefig('report/imagesprobabilities.png', facecolor='white')
     # Show plot
     plt.show()
 
